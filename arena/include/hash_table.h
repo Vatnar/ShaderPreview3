@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef uintptr_t IPtr;
+#include "typedefs.h"
 
 typedef struct
 {
@@ -24,13 +24,13 @@ typedef struct
 #define HT_MALLOC malloc
 #define HT_FREE free
 
-static size_t hash_pointer(const HashTable *hash_table, void *ptr)
+internal size_t hash_pointer(const HashTable *hash_table, void *ptr)
 {
-    static const IPtr GOLDEN_RATIO = 0x9e3779b97f4a7c15UL;
+    local_persist const IPtr GOLDEN_RATIO = 0x9e3779b97f4a7c15UL;
     return ((IPtr) ptr * GOLDEN_RATIO) % hash_table->HASH_TABLE_SIZE;
 }
 
-static void hash_table_init(HashTable *hash_table)
+internal void hash_table_init(HashTable *hash_table)
 {
     if (hash_table->entries == NULL)
     {
@@ -45,7 +45,7 @@ static void hash_table_init(HashTable *hash_table)
     }
 }
 
-static void hash_table_insert(HashTable *hash_table, void *key, void *value)
+internal void hash_table_insert(HashTable *hash_table, void *key, void *value)
 {
     size_t idx   = hash_pointer(hash_table, key);
     size_t start = idx;
@@ -66,7 +66,7 @@ static void hash_table_insert(HashTable *hash_table, void *key, void *value)
     entry->occupied       = 1;
 }
 
-static void *hash_table_lookup(const HashTable *hash_table, void *key)
+internal void *hash_table_lookup(const HashTable *hash_table, void *key)
 {
     size_t idx   = hash_pointer(hash_table, key);
     size_t start = idx;
@@ -84,7 +84,7 @@ static void *hash_table_lookup(const HashTable *hash_table, void *key)
     return NULL;
 }
 
-static void hash_table_delete(HashTable *hash_table, void *key)
+internal void hash_table_delete(HashTable *hash_table, void *key)
 {
     size_t idx   = hash_pointer(hash_table, key);
     size_t start = idx;
@@ -106,7 +106,7 @@ static void hash_table_delete(HashTable *hash_table, void *key)
     exit(1);
 }
 
-static size_t hash_table_count(const HashTable *hash_table)
+internal size_t hash_table_count(const HashTable *hash_table)
 {
     size_t count = 0;
     for (size_t i = 0; i < hash_table->HASH_TABLE_SIZE; i++)
@@ -115,7 +115,7 @@ static size_t hash_table_count(const HashTable *hash_table)
 }
 
 
-static void hash_table_cleanup(HashTable *hash_table)
+internal void hash_table_cleanup(HashTable *hash_table)
 {
     if (hash_table->entries != NULL)
     {

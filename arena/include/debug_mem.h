@@ -18,19 +18,13 @@ typedef struct
     int         line;
 } Allocation;
 
-static HashTable  hash_table;
-static HashTable *hash_table_ptr = &hash_table;
+extern HashTable  hash_table;
+extern HashTable *hash_table_ptr;
+extern pthread_once_t once;
 
-static pthread_once_t once = PTHREAD_ONCE_INIT;
+void debug_init_hash_table(void);
 
-static void debug_init_hash_table(void)
-{
-    hash_table.entries         = NULL;
-    hash_table.HASH_TABLE_SIZE = 1024;
-    hash_table_init(hash_table_ptr);
-}
-
-static void *debug_malloc(const size_t size, const char *file, const int line)
+internal void *debug_malloc(const size_t size, const char *file, const int line)
 {
     pthread_once(&once, debug_init_hash_table);
 
@@ -60,7 +54,7 @@ static void *debug_malloc(const size_t size, const char *file, const int line)
     return ptr;
 }
 
-static void debug_free(void *ptr)
+internal void debug_free(void *ptr)
 {
     if (ptr == NULL)
     {
@@ -83,7 +77,7 @@ static void debug_free(void *ptr)
 #define malloc(size) debug_malloc(size, __FILE__, __LINE__)
 #define free(ptr) debug_free(ptr)
 
-static void debug_mem_check_allocations(void)
+internal size_t debug_mem_check_allocations(void)
 {
     size_t count = 0;
 
@@ -105,15 +99,18 @@ static void debug_mem_check_allocations(void)
         printf("DEBUG_MEMORY: %lu instances of unfreed memory\n", count);
     else
         printf("DEBUG_MEMORY: No memory leaked\n");
+
+    return count;
 }
 
-static size_t debug_mem_remaining_frees(void)
+internal size_t debug_mem_remaining_frees(void)
 {
     return hash_table_count(hash_table_ptr);
 }
 
-static size_t debug_mem_end_summary()
+internal size_t debug_mem_end_summary()
 {
-    debug_mem_check_allocations();
+    const size_t remaining_allocs = debug_mem_check_allocations();
     hash_table_cleanup(hash_table_ptr);
+    return remaining_allocs;
 }
