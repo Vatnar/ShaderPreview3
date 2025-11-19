@@ -97,8 +97,8 @@
 #define printfc_prefix_file_location(COLOR, prefix, fmt, ...)                  \
     do                                                                         \
     {                                                                          \
-        printf("%s[%s]%s  " fmt "\n\tat %s:%d\n", COLOR, prefix,             \
-               COLOR_RESET, ##__VA_ARGS__, __FILE_NAME__, __LINE__);      \
+        printf("%s[%s]%s  " fmt "\n\tat %s:%d\n", COLOR, prefix, COLOR_RESET,  \
+               ##__VA_ARGS__, __FILE_NAME__, __LINE__);                        \
     }                                                                          \
     while (0)
 

@@ -1,2 +1,2 @@
-add_library(color src/color.c)
-target_include_directories(color PUBLIC include)
+add_library(color INTERFACE)
+target_include_directories(color INTERFACE include)

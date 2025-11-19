@@ -1,23 +1,7 @@
 #include "arena.h"
-
 #include <string.h>
-
 #include "debug_mem.h"
 
-Arena *arena_alloc_(U64 size, const char *file, int line)
-{
-    Arena *arena = malloc(sizeof(Arena));
-    assert(arena != NULL);
-    arena->size     = size;
-    arena->base_pos = (U64) malloc(size);
-    assert(arena->base_pos != (U64) NULL);
-    arena->pos                  = 0;
-    arena->allocation_site_file = malloc(strlen(file) + 1);
-    strcpy(arena->allocation_site_file, file);
-    arena->allocation_site_line = line;
-
-    return arena;
-}
 void *arena_release(Arena *arena)
 {
     free((void *) arena->base_pos);
@@ -26,10 +10,14 @@ void *arena_release(Arena *arena)
     return NULL;
 }
 
+internal B32 arena_can_fit(const Arena *arena, const U64 size)
+{
+    return arena->pos + size <= arena->size;
+}
+
 void *arena_push(Arena *arena, const U64 size, const B32 zero)
 {
-    U64 new_pos = arena->pos + size;
-    if (arena->size < new_pos)
+    if (!arena_can_fit(arena, size))
     {
         return NULL;
     }
@@ -38,7 +26,7 @@ void *arena_push(Arena *arena, const U64 size, const B32 zero)
     {
         memset(ret, 0, size);
     }
-    arena->pos = new_pos;
+    arena->pos += size;
     return ret;
 }
 U64 arena_pos(const Arena *arena) { return arena->pos; }

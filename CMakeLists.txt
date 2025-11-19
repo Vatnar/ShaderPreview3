@@ -6,10 +6,18 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(arena)
 add_subdirectory(color)
+add_subdirectory(vui)
 
-add_executable(scratch scratch.c)
+find_package(PkgConfig REQUIRED)
+
+
+add_executable(scratch src/main.c)
+target_link_libraries(scratch PRIVATE vui)
+
+add_executable(demolayout src/demolayout.c)
+target_link_libraries(demolayout PRIVATE vui)
 add_executable(valgrind valgrind.c)
-target_link_libraries(scratch PRIVATE arena)
+
+
 target_link_libraries(valgrind PRIVATE arena)
-target_link_libraries(scratch PRIVATE color)
 add_subdirectory(tests)
